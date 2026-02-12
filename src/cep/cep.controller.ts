@@ -7,8 +7,13 @@ export class CepController {
 
     constructor(private readonly cepService: CepService) { }
 
-    @Get(':cep')
+    @Get('v1/:cep')
     async fetch(@Param('cep', ValidarCepPipe) cep: string) {
         return await this.cepService.fetchAll(cep)
+    }
+
+    @Get('v2/:cep')
+    async fetchParallel(@Param('cep', ValidarCepPipe) cep: string) {
+        return await this.cepService.fetchAllParallel(cep)
     }
 }
