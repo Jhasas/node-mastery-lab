@@ -1,98 +1,76 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Node Mastery Lab
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Personal reference repository for exploring Node.js and NestJS concepts. Built as a hands-on lab to study patterns like modular architecture, parallel HTTP requests, environment-based configuration, input validation pipes, and structured error handling.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## What It Does
 
-## Description
+A REST API that looks up Brazilian postal codes (CEP) using external services. It exposes two versions of the same endpoint to compare sequential vs parallel execution strategies:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Endpoint | Strategy | Description |
+|---|---|---|
+| `GET /cep/v1/:cep` | Sequential | Fetches address from ViaCEP, then uses the city name to query Nationalize |
+| `GET /cep/v2/:cep` | Parallel | Fetches both APIs concurrently via `Promise.all` |
 
-## Project setup
+The `:cep` parameter must be exactly 8 numeric digits (e.g., `01001000`). Invalid formats return `400 Bad Request`.
+
+## Tech Stack
+
+- **NestJS 11** — Framework
+- **TypeScript** (ES2023) — Language
+- **Axios** (`@nestjs/axios`) — HTTP client for external API calls
+- **ConfigModule** (`@nestjs/config`) — Environment-based configuration
+- **Jest 30** + **Supertest** — Unit and E2E testing
+
+## Getting Started
 
 ```bash
-$ npm install
+npm install
+npm run start:dev
+# Server runs on http://localhost:3000
 ```
 
-## Compile and run the project
+### Example Request
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+curl http://localhost:3000/cep/v2/01001000
 ```
 
-## Run tests
+## Available Scripts
 
-```bash
-# unit tests
-$ npm run test
+| Command | Description |
+|---|---|
+| `npm run start:dev` | Development server with file watching |
+| `npm run start:debug` | Debug mode with file watching |
+| `npm run build` | Compile TypeScript to `dist/` |
+| `npm run start:prod` | Run compiled output |
+| `npm test` | Run unit tests |
+| `npm run test:e2e` | Run end-to-end tests |
+| `npm run test:cov` | Run tests with coverage report |
+| `npm run lint` | Lint and auto-fix with ESLint |
+| `npm run format` | Format code with Prettier |
 
-# e2e tests
-$ npm run test:e2e
+## Environment Configuration
 
-# test coverage
-$ npm run test:cov
-```
+The app loads `.env.${NODE_ENV}` files (defaults to `.env.development`):
 
-## Deployment
+| Variable | Description |
+|---|---|
+| `PORT` | Server port (default: `3000`) |
+| `VIACEP_URL` | ViaCEP API base URL |
+| `NATIONALIZE_URL` | Nationalize API base URL |
+| `LOG_LEVEL` | Logging level (`debug` in dev, `warn` in prod) |
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## External APIs
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- [ViaCEP](https://viacep.com.br/) — Brazilian postal code lookup
+- [Nationalize.io](https://nationalize.io/) — Nationality prediction by name
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+## Concepts Explored
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- NestJS feature-module architecture
+- Custom validation pipes with `PipeTransform`
+- Sequential vs parallel external API calls (`Promise.all`)
+- Environment-aware configuration with `ConfigModule`
+- Error handling with `HttpException` and proper HTTP status codes
+- Dependency injection and the NestJS IoC container
+- Logging with the built-in NestJS `Logger`
